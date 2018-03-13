@@ -313,15 +313,20 @@ def showItemDetails(category_name, item):
 def newCatalogItem(category_name):
     if 'username' not in login_session:
         return redirect('/login')
+    category = session.query(Category).filter_by(name=category_name).one()
+    category_id = category.id
+    #catalogitem = session.query(Category).filter_by(id = category_id).one()
+    #name = request.form['name']
+    #description=request.form['description']
     if request.method == 'POST':
-        newCategoryItem = CategoryItem(
-            name=request.form['name'], description=request.form['description'], user_id=login_session['user_id'])
-        session.add(newCategoryItem)
+        newCatalogItem = CategoryItem(
+            name=request.form['name'], description=request.form['description'], category_id=category_id, user_id=login_session['user_id'])
+        session.add(newCatalogItem)
         flash('New Catalog Item %s Successfully Created' % newCatalogItem.name)
         session.commit()
         return redirect(url_for('showCategories'))
     else:
-        return render_template('newitem.html')
+        return render_template('newitem.html', category_name=category_name)
 
 # TO DO - Edit an item
 # @app.route('/catalog/<item>/edit/', methods=['GET', 'POST'])
