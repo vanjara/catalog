@@ -1,16 +1,14 @@
 <div class="row top-menu">
-	<div class="col-md-6">
+	<div class="col-md-3">
 		<a href="{{url_for('showCategories')}}">
 			<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show Catalog
 		</a>
 	</div>
-	<div class="col-md-6 text-right">
+	<div class="col-md-9">
 			{%if 'username' not in session %}
 			<a href="{{url_for('showLogin')}}">Click Here to Login </a>
 			{% else %}
-			<!-- to DO - changed disconnect to fbdisconnect, so will need to fix this -->
-			<a href="{{url_for('fbdisconnect')}}">Logout </a>
+			<a href="{{url_for('disconnect')}}">Logout</a>
 			{% endif %}
-
 	</div>
 </div>

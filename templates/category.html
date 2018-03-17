@@ -1,23 +1,44 @@
-<html>
+<!-- <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      </head>
 
-<body>
+<body> -->
 
-<h1>{{category.name}}</h1>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
 
+<div class="row">
+    <div class="container-fluid">
+      <div class="col-md-2" style="border-right:1px solid #F1F1F1">
+      <h2>Categories</h2>
+        <ul class="list-unstyled">
+          {% for cat in all_categories %}
+          <a href = "{{url_for('showCategoryItems', category_name = cat.name)}}">
+          <li><strong>{{cat.name}}</strong></li></a>
+          {% endfor %}
+        </ul>
 
-{% for i in items %}
+    </div>
+      <h2>{{category.name}} Items ({{item_count}} items)</h2>
+      <div class="col-md-10">
+        <ul class="list-unstyled">
+            {% for i in items %}
+            <a href = "{{url_for('showItemDetails', category_name = category.name, item = i.name)}}">
+            <li><strong>{{i.name}}</strong> </li></a>
+            {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
 
-<div>
+{% endblock %}
 
-<h2>{{i.name}}</h2>
+<!-- </body>
 
-<p>{{i.description}}</p>
-
-
-</div>
-
-
-{% endfor %}
-</body>
-
-</html>
+</html> -->
