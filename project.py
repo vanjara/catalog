@@ -234,8 +234,6 @@ def getUserID(email):
         return None
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
-
-
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -276,7 +274,6 @@ def showCategories():
         return render_template('publichome.html', category=category, latest_items=latest_items)
     else:
         return render_template('home.html', category = category, latest_items = latest_items)
-    #return render_template('home.html', category = category, latest_items = latest_items)
 
 
 @app.route('/catalog/<category_name>/items')
@@ -294,55 +291,36 @@ def showItemDetails(category_name, item):
     #category_id = session.query(Category.id).filter_by(name=category_name)
     results = [r.description for r in session.query(CategoryItem.description).filter_by(name=item)]
     description = results[0]
-    '''results = [r.id for r in session.query(Category.id).filter_by(name=category_name)]
-    category_id = results[0]
-    category = session.query(Category).filter_by(id=category_id).one()'''
-
-    #category = session.query(Category).filter_by(name=category_name).one()
-    #items = session.query(CategoryItem).filter_by(category_id=category.id)
-    # output = ''
-    # output += "<h2>"
-    # output += item
-    # output += "</h2>"
-    # output += results[0]
-    '''for i in items:
-        output += i.name
-        output += '</br>'
-        output += i.description
-        output += '</br>'
-        output += '</br>'''
-    #return output
-    return render_template('items.html', item = item, description = description)
-
-
-@app.route('/catalog/<category_name>/new/', methods=['GET', 'POST'])
-def newCatalogItem(category_name):
     if 'username' not in login_session:
-        return redirect('/login')
-    category = session.query(Category).filter_by(name=category_name).one()
-    category_id = category.id
-    #catalogitem = session.query(Category).filter_by(id = category_id).one()
-    #name = request.form['name']
-    #description=request.form['description']
-    if request.method == 'POST':
-        newCatalogItem = CategoryItem(
-            name=request.form['name'], description=request.form['description'], category_id=category_id, user_id=login_session['user_id'])
-        session.add(newCatalogItem)
-        flash('New Catalog Item %s Successfully Created' % newCatalogItem.name)
-        session.commit()
-        return redirect(url_for('showCategories'))
+        return render_template('itemspublic.html', item = item, description = description)
     else:
-        return render_template('newitem.html', category_name=category_name)
+        return render_template('items.html', item = item, description = description)
+
+
+
+# @app.route('/catalog/<category_name>/new/', methods=['GET', 'POST'])
+# def newCatalogItem(category_name):
+#     if 'username' not in login_session:
+#         return redirect('/login')
+#     category = session.query(Category).filter_by(name=category_name).one()
+#     category_id = category.id
+#     #catalogitem = session.query(Category).filter_by(id = category_id).one()
+#     #name = request.form['name']
+#     #description=request.form['description']
+#     if request.method == 'POST':
+#         newCatalogItem = CategoryItem(
+#             name=request.form['name'], description=request.form['description'], category_id=category_id, user_id=login_session['user_id'])
+#         session.add(newCatalogItem)
+#         flash('New Catalog Item %s Successfully Created' % newCatalogItem.name)
+#         session.commit()
+#         return redirect(url_for('showCategories'))
+#     else:
+#         return render_template('newitem.html', category_name=category_name)
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newItem():
     if 'username' not in login_session:
         return redirect('/login')
-    #category = session.query(Category).filter_by(name=category_name).one()
-    #category_id = category.id
-    #catalogitem = session.query(Category).filter_by(id = category_id).one()
-    #name = request.form['name']
-    #description=request.form['description']
     if request.method == 'POST':
         newItem = CategoryItem(
             name=request.form['name'], description=request.form['description'], category_id = request.form['comp_select'], user_id=login_session['user_id'])

@@ -1,23 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-<!-- <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style>
-        .vl {
-            border-left: 1px solid #F1F1F1;
-            height: 500px;
-        }
-        </style>
-  </head>
-
-
-<body> -->
 
 <div class = 'flash'>
   {% with messages = get_flashed_messages() %}
@@ -41,26 +24,22 @@
         <li><strong style="color:red;">{{cat.name}}</strong></li></a>
         {% endfor %}
       </ul>
-
   </div>
 
   <div class="vl col-md-1" ></div>
 
+    <div class="col-md-9" style="border-left:1px solid #F1F1F1"></div>
     <h2>Latest Items</h2>
-    <div class="col-md-9" style="border-left:1px solid #F1F1F1">
-      <ul class="list-unstyled">
+       <ul class="list-unstyled">
         {% for item in latest_items %}
         <a href = "{{url_for('showItemDetails', category_name = item[0].name, item = item[1].name)}}">
         <li><strong style="color:red;">{{item[1].name}}</strong></a> <i>({{item[0].name}})</i></li>
         {% endfor %}
+        <!-- <a href = '{{url_for('newItem', item=item)}}'>Add Item</a> -->
+
       </ul>
     </div>
   </div>
 </div>
 
-
-<!--
-</body>
-
-</html> -->
 {% endblock %}
