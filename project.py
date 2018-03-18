@@ -289,8 +289,9 @@ def showCategoryItems(category_name):
 def showItemDetails(category_name, item):
     print ("Name is " + category_name, "Item is " + item)
     #category_id = session.query(Category.id).filter_by(name=category_name)
-    results = [r.description for r in session.query(CategoryItem.description).filter_by(name=item)]
-    description = results[0]
+    #results = [r.description for r in session.query(CategoryItem.description).filter_by(name=item)]
+    thisItem = session.query(CategoryItem).filter_by(name=item).one()
+    description = thisItem.description
     if 'username' not in login_session:
         return render_template('itemspublic.html', item = item, description = description)
     else:
@@ -340,7 +341,10 @@ def editCatalogItem(item):
     if 'username' not in login_session:
         return redirect('/login')
     if editedItem.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this item. Please create your own item in order to edit.');}</script><body onload='myFunction()'>"
+        #return "<script>function myFunction() {alert('You are not authorized to edit this item. Please create your own item in order to edit.');}</script><body onload='myFunction()'>"
+        flash('You are not authorized to edit the item - %s. Please create your own item in order to edit' % editedItem.name)
+        return redirect(url_for('showCategories'))
+        #return render_template('editItem.html', editedItem=editedItem, category_name=category.name, categories = session.query(Category).all() )
     if request.method == 'POST':
         if request.form['name'] or request.form['description']:
             editedItem.name = request.form['name']
@@ -360,7 +364,9 @@ def deleteItem(item):
     if 'username' not in login_session:
         return redirect('/login')
     if itemToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this record. Please create your own Catalog item in order to delete.');}</script><body onload='myFunction()'>"
+        #return "<script>function myFunction() {alert('You are not authorized to delete this record. Please create your own Catalog item in order to delete.');}</script><body onload='myFunction()'>"
+        flash('You are not authorized to delete the item - %s. Please create your own item in order to edit' % itemToDelete.name)
+        return redirect(url_for('showCategories'))
     if request.method == 'POST':
         session.delete(itemToDelete)
         flash('%s Successfully Deleted' % itemToDelete.name)
