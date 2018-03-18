@@ -8,7 +8,7 @@
   <div id="signinButton">
     <span class="g-signin"
       data-scope="openid email"
-      data-clientid="633440504835-6743b70rcigigq4sqnd8svefvuljck36.apps.googleusercontent.com"
+      data-clientid="173138482533-2hgu5nnbdd9ljn96b7gj48r9hns6efje.apps.googleusercontent.com"
       data-redirecturi="postmessage"
       data-accesstype="offline"
       data-cookiepolicy="single_host_origin"
@@ -23,7 +23,7 @@
       if (authResult['code']) {
         // Hide the sign-in button now that the user is authorized
         $('#signinButton').attr('style', 'display: none');
-        // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+        // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main catalog page
         $.ajax({
           type: 'POST',
           url: '/gconnect?state={{STATE}}',
@@ -52,7 +52,7 @@
     <script>
       window.fbAsyncInit = function() {
       FB.init({
-        appId      : '1783588658611198',
+        appId      : '1841987982486628',
         cookie     : true,  // enable cookies to allow the server to access
                             // the session
         xfbml      : true,  // parse social plugins on this page

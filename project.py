@@ -1,3 +1,4 @@
+#/usr/bin/python2.7.12
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from sqlalchemy import create_engine, asc, DateTime, func, desc
 from sqlalchemy.orm import sessionmaker
@@ -13,12 +14,11 @@ import json
 from flask import make_response
 import requests
 
-
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = "Restaurant Menu Application"
+APPLICATION_NAME = "Catalog Application"
 
 engine = create_engine('sqlite:///categoryitems.db')
 Base.metadata.bind = engine
@@ -26,6 +26,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# The authentication code for Google and FB has been re-used from the Restaurant project
 # Copying the user login and JSON details from the course project
 # Create anti-forgery state token
 @app.route('/login')
@@ -33,9 +34,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
-
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -268,7 +267,7 @@ def catalogJSON():
 @app.route('/catalog/')
 def showCategories():
     category = session.query(Category).all()
-    #latest = session.query(CategoryItem).order_by(desc(CategoryItem.id)).limit(10).all()
+    # Using a join to get the details about recently added items and the corresponding categories
     latest_items = session.query(Category, CategoryItem).join(CategoryItem).order_by(desc(CategoryItem.id)).limit(10)
     if 'username' not in login_session:
         return render_template('publichome.html', category=category, latest_items=latest_items)
@@ -287,37 +286,18 @@ def showCategoryItems(category_name):
 
 @app.route('/catalog/<category_name>/<item>')
 def showItemDetails(category_name, item):
-    print ("Name is " + category_name, "Item is " + item)
-    #category_id = session.query(Category.id).filter_by(name=category_name)
-    #results = [r.description for r in session.query(CategoryItem.description).filter_by(name=item)]
+    print("Name is " + category_name, "Item is " + item)
+    # Since the path has the item name and we want description
+    # let us get the parent first ...
     thisItem = session.query(CategoryItem).filter_by(name=item).one()
+    # ... and then from it get the description
     description = thisItem.description
     if 'username' not in login_session:
         return render_template('itemspublic.html', item = item, description = description)
     else:
         return render_template('items.html', item = item, description = description)
 
-
-
-# @app.route('/catalog/<category_name>/new/', methods=['GET', 'POST'])
-# def newCatalogItem(category_name):
-#     if 'username' not in login_session:
-#         return redirect('/login')
-#     category = session.query(Category).filter_by(name=category_name).one()
-#     category_id = category.id
-#     #catalogitem = session.query(Category).filter_by(id = category_id).one()
-#     #name = request.form['name']
-#     #description=request.form['description']
-#     if request.method == 'POST':
-#         newCatalogItem = CategoryItem(
-#             name=request.form['name'], description=request.form['description'], category_id=category_id, user_id=login_session['user_id'])
-#         session.add(newCatalogItem)
-#         flash('New Catalog Item %s Successfully Created' % newCatalogItem.name)
-#         session.commit()
-#         return redirect(url_for('showCategories'))
-#     else:
-#         return render_template('newitem.html', category_name=category_name)
-
+# Add a new item
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newItem():
     if 'username' not in login_session:
@@ -340,17 +320,16 @@ def editCatalogItem(item):
     print("In edit item")
     if 'username' not in login_session:
         return redirect('/login')
+    # If logged in user is not the one who created the item, flash a message and go back to home page
     if editedItem.user_id != login_session['user_id']:
-        #return "<script>function myFunction() {alert('You are not authorized to edit this item. Please create your own item in order to edit.');}</script><body onload='myFunction()'>"
         flash('You are not authorized to edit the item - %s. Please create your own item in order to edit' % editedItem.name)
         return redirect(url_for('showCategories'))
-        #return render_template('editItem.html', editedItem=editedItem, category_name=category.name, categories = session.query(Category).all() )
     if request.method == 'POST':
         if request.form['name'] or request.form['description']:
             editedItem.name = request.form['name']
             editedItem.description = request.form['description']
             editedItem.category_id = request.form['comp_select']
-            flash('Successfully updated item - %s'% editedItem.name)
+            flash('Successfully updated %s'% editedItem.name)
             session.commit()
             return redirect(url_for('showCategories'))
     else:
@@ -363,13 +342,13 @@ def deleteItem(item):
     itemToDelete = session.query(CategoryItem).filter_by(name=item).one()
     if 'username' not in login_session:
         return redirect('/login')
+    # If logged in user is not the one who created the item, flash a message and go back to home page
     if itemToDelete.user_id != login_session['user_id']:
-        #return "<script>function myFunction() {alert('You are not authorized to delete this record. Please create your own Catalog item in order to delete.');}</script><body onload='myFunction()'>"
         flash('You are not authorized to delete the item - %s. Please create your own item in order to edit' % itemToDelete.name)
         return redirect(url_for('showCategories'))
     if request.method == 'POST':
         session.delete(itemToDelete)
-        flash('%s Successfully Deleted' % itemToDelete.name)
+        flash('%s Successfully Deleted ' % itemToDelete.name)
         session.commit()
         return redirect(url_for('showCategories'))
     else:
